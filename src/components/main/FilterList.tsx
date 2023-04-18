@@ -23,15 +23,17 @@ type Props = {
 };
 
 const FilterList = ({ onToggle }: Props) => {
-  const [defaultValues, setDefaultValues] = useState<number[]>();
-  const [currentValues, setCurrentValues] = useState<number[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [spaceFilters, setSpaceFilters] = useState<string[]>(
-    searchParams.getAll('space'),
-  );
 
   const { products } = useAppSelector((state) => state.products);
+
   const spaceList = getUniqueSpaces(products);
+
+  const [defaultValues, setDefaultValues] = useState<number[]>();
+  const [currentValues, setCurrentValues] = useState<number[]>([]);
+  const [checkedFilters, setCheckedFilters] = useState<string[]>(
+    searchParams.getAll('space'),
+  );
 
   useEffect(() => {
     const priceRange = searchParams.getAll('price');
@@ -56,17 +58,17 @@ const FilterList = ({ onToggle }: Props) => {
   };
 
   const onToggleSpace = (key: string) => {
-    const isExists = spaceFilters.includes(key);
+    const isExists = checkedFilters.includes(key);
     if (isExists) {
-      setSpaceFilters((prev) => prev.filter((v) => v !== key));
+      setCheckedFilters((prev) => prev.filter((v) => v !== key));
     } else {
-      setSpaceFilters((prev) => [...prev, key]);
+      setCheckedFilters((prev) => [...prev, key]);
     }
   };
 
   const applyFilter = () => {
     setSearchParams({
-      space: spaceFilters,
+      space: checkedFilters,
       price: currentValues.map((value) => `${value}`),
     });
     onToggle();
@@ -81,39 +83,50 @@ const FilterList = ({ onToggle }: Props) => {
       border="1px solid lightgray"
       borderRadius="2px"
       py="25px"
-      px="80px"
+      px="20px"
     >
-      <VStack as="section" w="100%" h="200px">
+      <VStack as="section" w="400px" h="300px" justifyContent={'space-between'}>
         <Heading fontSize="lg" mb="20px">
           필터 옵션
         </Heading>
-        <Text>가격</Text>
-        {defaultValues && (
-          <RangeSlider defaultValue={defaultValues} onChange={onSlidePrice}>
-            <RangeSliderTrack>
-              <RangeSliderFilledTrack bg="#789BFB" />
-            </RangeSliderTrack>
-            <RangeSliderThumb index={0} bg="#b0c4fa" />
-            <RangeSliderThumb index={1} bg="#b0c4fa" />
-          </RangeSlider>
-        )}
-        <Text fontSize="12px">
-          {formatNumToWon(currentValues[0])} ~{' '}
-          {formatNumToWon(currentValues[1])}
-        </Text>
-        <Spacer flex="1" />
-        <Text>지역</Text>
-        <Stack direction="row">
-          {spaceList.map((spaceKey) => (
-            <SpaceTag
-              key={spaceKey}
-              spaceKey={spaceKey}
-              isSelected={spaceFilters.includes(spaceKey)}
-              onToggleSpace={onToggleSpace}
-            />
-          ))}
-        </Stack>
-        <Button onClick={applyFilter}>적용</Button>
+        <VStack>
+          <Text>가격</Text>
+          {defaultValues && (
+            <RangeSlider defaultValue={defaultValues} onChange={onSlidePrice}>
+              <RangeSliderTrack>
+                <RangeSliderFilledTrack bg="#789BFB" />
+              </RangeSliderTrack>
+              <RangeSliderThumb index={0} bg="#b0c4fa" />
+              <RangeSliderThumb index={1} bg="#b0c4fa" />
+            </RangeSlider>
+          )}
+          <Text fontSize="12px">
+            {formatNumToWon(currentValues[0])} ~{' '}
+            {formatNumToWon(currentValues[1])}
+          </Text>
+          <Spacer flex="1" />
+          <Text>지역</Text>
+          <Stack direction="row">
+            {spaceList.map((spaceKey) => (
+              <SpaceTag
+                key={spaceKey}
+                spaceKey={spaceKey}
+                isSelected={checkedFilters.includes(spaceKey)}
+                onToggleSpace={onToggleSpace}
+              />
+            ))}
+          </Stack>
+        </VStack>
+        <Button
+          p="1"
+          w="60px"
+          alignSelf={'flex-end'}
+          background="#789BFB"
+          color="white"
+          onClick={applyFilter}
+        >
+          적용
+        </Button>
       </VStack>
     </Box>
   );

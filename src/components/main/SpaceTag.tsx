@@ -5,9 +5,11 @@ const SpaceTag = ({ spaceKey, isSelected, onToggleSpace }: ISpaceTagProps) => {
   return (
     <Tag
       key={spaceKey}
-      variant={isSelected ? 'solid' : 'outline'}
-      bg={isSelected ? '#FFF1DC' : 'white'}
+      variant={isSelected ? 'outline' : 'solid'}
+      bg={isSelected ? '#FFF1DC' : '#EDF2F7'}
       color="black"
+      fontWeight={isSelected ? 'bold' : 'medium'}
+      padding="10px 20px"
       onClick={() => onToggleSpace(spaceKey)}
       cursor="pointer"
     >
