@@ -1,6 +1,6 @@
 export interface ISpaceTagProps {
   spaceKey: string;
-  spaceHashMap: { [key: string]: boolean };
+  isSelected: boolean;
   onToggleSpace: (key: string) => void;
 }
 
