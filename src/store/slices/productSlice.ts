@@ -10,18 +10,7 @@ export const getProducts = createAsyncThunk<IProduct[]>(
 const initialState: IProductReducer = {
   isLoading: true,
   error: null,
-  products: [
-    {
-      idx: 0,
-      name: '',
-      mainImage: '',
-      description: '',
-      spaceCategory: '',
-      price: 0,
-      maximumPurchases: 0,
-      registrationDate: '',
-    },
-  ],
+  products: [],
 };
 const productSlice = createSlice({
   name: 'products',
