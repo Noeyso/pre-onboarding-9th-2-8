@@ -33,14 +33,23 @@ const ProductList = () => {
   useEffect(() => {
     if (!products) return;
     const spaces = searchParams.getAll('space');
-    if (!spaces.length) {
+    const prices = searchParams.getAll('price');
+
+    if (!spaces && !prices) {
       setFilteredProducts(products);
       return;
     }
 
     setFilteredProducts(
       products.filter((value) => {
-        return spaces.includes(value.spaceCategory);
+        const isMatchSpace = spaces.length
+          ? spaces.includes(value.spaceCategory)
+          : true;
+        const isMatchPrice = prices.length
+          ? value.price >= parseInt(prices[0]) &&
+            value.price <= parseInt(prices[1])
+          : true;
+        return isMatchSpace && isMatchPrice;
       }),
     );
   }, [products, searchParams]);

@@ -23,6 +23,7 @@ type Props = {
 };
 
 const FilterList = ({ onToggle }: Props) => {
+  const [defaultValues, setDefaultValues] = useState<number[]>();
   const [currentValues, setCurrentValues] = useState<number[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [spaceFilters, setSpaceFilters] = useState<string[]>(
@@ -33,7 +34,19 @@ const FilterList = ({ onToggle }: Props) => {
   const spaceList = getUniqueSpaces(products);
 
   useEffect(() => {
-    setCurrentValues([0, getMaxPrice(products)]);
+    const priceRange = searchParams.getAll('price');
+
+    if (priceRange.length && products.length) {
+      setDefaultValues(
+        priceRange.map(
+          (value) => (parseInt(value) / getMaxPrice(products)) * 100,
+        ),
+      );
+      setCurrentValues(priceRange.map((value) => parseInt(value)));
+    } else {
+      setDefaultValues([0, 100]);
+      setCurrentValues([0, getMaxPrice(products)]);
+    }
   }, [products, searchParams]);
 
   const onSlidePrice = (event: number[]) => {
@@ -52,7 +65,10 @@ const FilterList = ({ onToggle }: Props) => {
   };
 
   const applyFilter = () => {
-    setSearchParams({ space: spaceFilters });
+    setSearchParams({
+      space: spaceFilters,
+      price: currentValues.map((value) => `${value}`),
+    });
     onToggle();
   };
 
@@ -72,13 +88,15 @@ const FilterList = ({ onToggle }: Props) => {
           필터 옵션
         </Heading>
         <Text>가격</Text>
-        <RangeSlider defaultValue={[0, 100]} onChange={onSlidePrice}>
-          <RangeSliderTrack>
-            <RangeSliderFilledTrack bg="#789BFB" />
-          </RangeSliderTrack>
-          <RangeSliderThumb index={0} bg="#b0c4fa" />
-          <RangeSliderThumb index={1} bg="#b0c4fa" />
-        </RangeSlider>
+        {defaultValues && (
+          <RangeSlider defaultValue={defaultValues} onChange={onSlidePrice}>
+            <RangeSliderTrack>
+              <RangeSliderFilledTrack bg="#789BFB" />
+            </RangeSliderTrack>
+            <RangeSliderThumb index={0} bg="#b0c4fa" />
+            <RangeSliderThumb index={1} bg="#b0c4fa" />
+          </RangeSlider>
+        )}
         <Text fontSize="12px">
           {formatNumToWon(currentValues[0])} ~{' '}
           {formatNumToWon(currentValues[1])}
